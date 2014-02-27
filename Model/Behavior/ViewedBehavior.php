@@ -49,7 +49,7 @@ class ViewedBehavior extends ModelBehavior {
      * @param boolean $created
      * @param array $options
      */
-    public function afterSave( Model $modelo, boolean $created, array $options = array() ) {
+    public function afterSave( Model $modelo, $created, array $options = array() ) {
         if( $created ) {
             // Genero una nueva entrada en el sistema para este elemento recién creado
             $data = array(
@@ -60,13 +60,14 @@ class ViewedBehavior extends ModelBehavior {
                     'modified' => false
                 )
             );
-            $this->loadModel( 'Viewed' );
+            $this->Viewed = ClassRegistry::init('Viewed.Viewed');
             $this->Viewed->save( $data );
             return;
         }        
     }
     
     public function afterDelete( Model $modelo ) {
-        
+        $this->Viewed = ClassRegistry::init('Viewed.Viewed');
+        $this->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
     }
 }

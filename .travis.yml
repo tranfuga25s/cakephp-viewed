@@ -35,4 +35,4 @@ before_script:
   - echo "Configure::write('Security.cipherSeed', '7685923096357445354624962749683645');" >> cakephp/app/Config/core.php
 
 script:
-  - ./cakephp/app/Console/cake test Viewed AllTests --stderr
+  - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr

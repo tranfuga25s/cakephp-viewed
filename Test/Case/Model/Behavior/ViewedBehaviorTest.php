@@ -3,20 +3,15 @@ App::uses('Model', 'Model');
 App::uses('ModelBehavior', 'Model');
 App::uses('ViewedBehavior', 'Viewed.Behavior' );
 
-class Viewed extends CakeTestModel {
-    public $name = 'Viewed';
-    public $useTable = 'viewed';
-}
-
-
 /**
  * ViewedTestCase
  * @author Esteban Zeller
  */
 class ViewedTest extends CakeTestCase {
   
-    public $fixture = array(
-        'core.Article'
+    public $fixtures = array(
+        'core.article',
+        'plugin.viewed.viewed'
     );
 
     /**
@@ -27,7 +22,7 @@ class ViewedTest extends CakeTestCase {
     public function setUp() {
             parent::setUp();
             $this->Article = ClassRegistry::init('Article');
-            $this->Viewed = ClassRegistry::init('Viewed');
+            $this->Viewed = ClassRegistry::init('Viewed.Viewed');
     }
 
     /**
@@ -76,29 +71,31 @@ class ViewedTest extends CakeTestCase {
      * @author
      */
     public function testCreation() {
-        $data = array(
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $save_data = array(
             'Article' => array(
                 'title' => 'test'
             )            
         );
-        $this->assertNotEqual( false, $this->Article->save( $data ), "Falla el guardar" );
+        $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
         $id = $this->Article->id;
-        $this->assertGreaterThan( 0, $id, "El id es incorrecto?" );
+        $this->assertGreaterThan( 0, $id, "El id es incorrecto!" );
         
         $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => 'Article', 'model_id' => $id ) ) );
-        $this->assertNotEqual( count( $data ), 0, "NO se creo ningun registro!" );
+        $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro!" );
+        $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos!" );
         
-        $this->assertArrayHasKey( 'model', $data, "No se encuentra el modelo relacionado" );
-        $this->assertEqual( $data['model'], 'Article', 'No coincide el nombre del modelo' );
+        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado" );
+        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo' );
         
-        $this->assertArrayHasKey( 'model_id', $data, "No se encuentra el id del modelo relacionado" );
-        $this->assertEqual( $data['model_id'],  $id, 'No coincide el nombre del modelo' );
+        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado" );
+        $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo' );
         
-        $this->assertArrayHasKey( 'viewed', $data, "No se encuentra el campo viewed" );
-        $this->assertEqual( $data['viewed'], false, 'No coincide el campo viewed' );
+        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed" );
+        $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed' );
         
-        $this->assertArrayHasKey( 'modified', $data, "No se encuentra el campo modified" );
-        $this->assertEqual( $data['modified'], false, 'No coincide el campo modified' );
+        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
+        $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
         
     }
 
