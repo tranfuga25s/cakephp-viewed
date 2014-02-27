@@ -29,7 +29,7 @@ before_script:
      'persistent' => false,
    );
    }" > cakephp/app/Config/database.php
-  - sh -c "./cakephp/app/Console/cake schema create Viewed << EOF
+  - sh -c "./cakephp/app/Console/cake schema create --plugin Viewed << EOF
            n
            y
            EOF";
