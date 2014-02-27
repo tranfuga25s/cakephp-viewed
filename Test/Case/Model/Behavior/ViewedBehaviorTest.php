@@ -134,7 +134,6 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
         $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified' );
-
     }
 
     /**
@@ -146,6 +145,10 @@ class ViewedTest extends CakeTestCase {
         $this->assertNotEqual( count( $data[$this->Article->alias]), 0, "No se trajo ningun campo" );
 
         $this->Article->Behaviors->load('Viewed.Viewed');
+        $save_data[$this->Article->alias][$this->Article->primaryKey] = $data[$this->Article->alias][$this->Article->primaryKey];
+        $save_data[$this->Article->alias][$this->Article->displayField] = 'New title';
+        $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
+
 
         $this->assertNotEqual( $this->Article->delete( $data[$this->Article->alias][$this->Article->primaryKey] ), false, "No se pudo eliminar el registro" );
 
@@ -158,11 +161,23 @@ class ViewedTest extends CakeTestCase {
     }
 
     /**
-     * Testea el agregado de los 2 datos al find
+     * Testea el uso de la funcion directamente
      */
-    /*public function testModificacionDirecta() {
+    public function testGetStatus() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
 
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $data = $this->Article->find( 'first', array( 'conditions' => array( $this->Article->primaryKey => $this->Article->id ) ) );
+
+        $this->assertArrayHasKey( $this->Article->alias, $data, "Los datos devueltos no tienen el formato recomendado" );
+        $this->assertArrayHasKey( 'viewed', $data[$this->Article->alias], "Falta el campo de viewed" );
+        //$this->assertArrayHasKey( 'modified', $data[$this->Article->alias], "Falta el campo de modified_viewed" );
     }
-     */
 
 }

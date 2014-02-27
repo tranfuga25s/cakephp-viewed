@@ -73,11 +73,13 @@ class ViewedBehavior extends ModelBehavior {
                 'fields' => array( $modelo->primaryKey ),
                 'recursive' => -1
             ) );
-            debug( $data );
             if( count( $data ) <= 0 ) {
-                // No existe el registro!
-                echo "No existe el registro anterior del dato!";
-                return;
+                $data = array(
+                    'Viewed' => array(
+                        'model' => $modelo->alias,
+                        'model_id' => $modelo->id
+                    )
+                );
             }
             $data['Viewed']['modified'] = true;
             $data['Viewed']['viewed'] = false;
@@ -86,8 +88,38 @@ class ViewedBehavior extends ModelBehavior {
         }
     }
 
+    /**
+     *
+     */
     public function afterDelete( Model $modelo ) {
         $this->Viewed = ClassRegistry::init('Viewed.Viewed');
         $this->Viewed->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
+    }
+
+    /**
+     * Funcion para ingresar los campos relacionados
+     * @param modelo Modelo
+     * @param resultados Resultados devueltos
+     * @param primary boolean ?
+     * @return
+     */
+    public function afterFind( Model $modelo, $results, $primary = false ) {
+        if( count( $results ) > 0 ) {
+            $this->Viewed = ClassRegistry::init('Viewed.Viewed');
+            foreach( $results as &$result ) {
+                $data = $this->Viewed->find( 'first', array(
+                    'conditions' => array(
+                        'model' => $modelo->alias,
+                        'model_id' => $result[$modelo->alias][$modelo->primaryKey]
+                    ),
+                    'recursive' => -1,
+                    'fields' => array( 'viewed' )
+                ));
+                if( count( $data ) > 0 ) {
+                    $result[$modelo->alias]['viewed'] = $data['Viewed']['viewed'];
+                }
+            }
+        }
+        return $results;
     }
 }
