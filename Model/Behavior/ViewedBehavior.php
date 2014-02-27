@@ -1,7 +1,7 @@
 <?php
 /*!
  * Viewed Behavior
- * 
+ *
  * @author Esteban Zeller
  */
 class ViewedBehavior extends ModelBehavior {
@@ -13,20 +13,20 @@ class ViewedBehavior extends ModelBehavior {
       'useModified' => true,
       'markUnviewedOnModified' => true
     );
-    
+
     /*!
      * Saves the current preferences
      */
     public $settings = null;
-    
+
     /*!
      * Inicializa el sistem
      */
-    public function setup( Model $model, array $settings = array() ) {
+    public function setup( Model $model, $settings = array() ) {
         // combino las propiedades
         $this->settings = array_merge( $settings, $this->defaults );
     }
-    
+
     /*!
      * Devuelve las preferencias
      * @param Model Modelo
@@ -42,14 +42,14 @@ class ViewedBehavior extends ModelBehavior {
         }
         return $this->settings[$value];
     }
-    
+
     /**
      * Funcion que actualiza los datos del modelo relacionado
      * @param Model $modelo
      * @param boolean $created
      * @param array $options
      */
-    public function afterSave( Model $modelo, $created, array $options = array() ) {
+    public function afterSave( Model $modelo, $created, $options = array() ) {
         if( $created ) {
             // Genero una nueva entrada en el sistema para este elemento recién creado
             $data = array(
@@ -63,9 +63,23 @@ class ViewedBehavior extends ModelBehavior {
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
             $this->Viewed->save( $data );
             return;
-        }        
+        } else {
+            // Actualizo la información del registro
+            $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+            $data = $this->Viewed->find( 'first', array(
+                'conditions' => array( 'model' => $modelo->alias,
+                                       'model_id' => $modelo->id
+                                ),
+                'fields' => array( 'id' ),
+                'recursive' => -1
+            ) );
+            $data['Viewed']['modified'] = true;
+            $data['Viewed']['viewed'] = false;
+            $this->Viewed->save( $data );
+            return;
+        }
     }
-    
+
     public function afterDelete( Model $modelo ) {
         $this->Viewed = ClassRegistry::init('Viewed.Viewed');
         $this->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
