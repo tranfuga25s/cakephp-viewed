@@ -9,7 +9,6 @@ before_script:
   - cd ..
   - mv cakephp-viewed cakephp/app/Plugin/Viewed
   - chmod -R 777 cakephp/app/tmp
-  - sh -c "mysql -e 'CREATE DATABASE test;'"
   - echo "<?php
    class DATABASE_CONFIG {
    public \$default = array(
