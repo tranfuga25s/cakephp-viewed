@@ -1,3 +1,4 @@
+USE test;
 DROP TABLE IF EXISTS `viewed`;
 CREATE TABLE `viewed` (
     `id` int(11) NOT NULL AUTO_INCREMENT,

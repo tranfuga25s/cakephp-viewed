@@ -9,12 +9,12 @@ before_script:
   - cd ..
   - mv cakephp-viewed cakephp/app/Plugin/Viewed
   - chmod -R 777 cakephp/app/tmp
-  - sh -c "mysql -e 'CREATE DATABASE turnera;'"
+  - sh -c "mysql -e 'CREATE DATABASE test;'"
   - echo "<?php
    class DATABASE_CONFIG {
    public \$default = array(
      'datasource' => 'Database/Mysql',
-     'database' => 'turnera',
+     'database' => 'test',
      'host' => '0.0.0.0',
      'login' => 'travis',
      'prefix' => '',
@@ -22,10 +22,10 @@ before_script:
    );
    public \$test = array(
      'datasource' => 'Database/Mysql',
-     'database' => 'turnera',
+     'database' => 'test',
      'host' => '0.0.0.0',
      'login' => 'travis',
-     'prefix' => '',
+     'prefix' => 'test_',
      'persistent' => false,
    );
    }" > cakephp/app/Config/database.php
