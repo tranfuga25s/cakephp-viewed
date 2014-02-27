@@ -119,7 +119,7 @@ class ViewedTest extends CakeTestCase {
         $save_data['title'] = 'New title';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
 
-        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => 'Article', 'model_id' => $save_data['Article']['id'] ) ) );
+        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
         $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro!" );
         $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos!" );
 
@@ -136,5 +136,33 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified' );
 
     }
+
+    /**
+     * Testea que los datos sean eliminados correctamente
+     */
+    public function testEliminacion() {
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias]), 0, "No se trajo ningun campo" );
+
+        $this->Article->Behaviors->load('Viewed.Viewed');
+
+        $this->assertNotEqual( $this->Article->delete( $data[$this->Article->alias][$this->Article->primaryKey] ), false, "No se pudo eliminar el registro" );
+
+        $datos = $this->Viewed->find( 'first', array( 'conditions' => array(
+            'model' => $this->Article->alias,
+            'model_id' => $data[$this->Article->alias][$this->Article->primaryKey] ) )
+        );
+        $this->assertEqual( count( $datos ), 0, "No deberian de existir mas datos acerca del modelo eliminado" );
+
+    }
+
+    /**
+     * Testea el agregado de los 2 datos al find
+     */
+    /*public function testModificacionDirecta() {
+
+    }
+     */
 
 }

@@ -70,9 +70,15 @@ class ViewedBehavior extends ModelBehavior {
                 'conditions' => array( 'model' => $modelo->alias,
                                        'model_id' => $modelo->id
                                 ),
-                'fields' => array( 'id' ),
+                'fields' => array( $modelo->primaryKey ),
                 'recursive' => -1
             ) );
+            debug( $data );
+            if( count( $data ) <= 0 ) {
+                // No existe el registro!
+                echo "No existe el registro anterior del dato!";
+                return;
+            }
             $data['Viewed']['modified'] = true;
             $data['Viewed']['viewed'] = false;
             $this->Viewed->save( $data );
@@ -82,6 +88,6 @@ class ViewedBehavior extends ModelBehavior {
 
     public function afterDelete( Model $modelo ) {
         $this->Viewed = ClassRegistry::init('Viewed.Viewed');
-        $this->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
+        $this->Viewed->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
     }
 }
