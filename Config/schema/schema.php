@@ -15,7 +15,6 @@ class ViewedSchema extends CakeSchema {
     public function after($event = array()) {
     }
 
-
     public $viewed = array(
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
         'model' => array('type' => 'text', 'null' => false, 'default' => null, 'collate' => 'utf8_spanish_ci', 'charset' => 'utf8'),
