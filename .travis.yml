@@ -29,10 +29,7 @@ before_script:
      'persistent' => false,
    );
    }" > cakephp/app/Config/database.php
-  - sh -c "./cakephp/app/Console/cake schema create --plugin Viewed --file schema.php << EOF
-           n
-           y
-           EOF";
+  - sh -c "mysql < cakephp/app/Plugin/Viewed/Config/Schema/schema.sql"
   - echo "CakePlugin::load( 'Viewed' ); " >> cakephp/app/Config/bootstrap.php
   - echo "Configure::write('Security.salt', 'DYhG93b0qyJtfIxufs2gruVoUubWnwvniRe2G0FraCa9mi');" >> cakephp/app/Config/core.php
   - echo "Configure::write('Security.cipherSeed', '7685923096357445354624962749683645');" >> cakephp/app/Config/core.php

@@ -43,8 +43,27 @@ class ViewedBehavior extends ModelBehavior {
         return $this->settings[$value];
     }
     
-    public function afterSave( Model $modelo ) {
-        
+    /**
+     * Funcion que actualiza los datos del modelo relacionado
+     * @param Model $modelo
+     * @param boolean $created
+     * @param array $options
+     */
+    public function afterSave( Model $modelo, boolean $created, array $options = array() ) {
+        if( $created ) {
+            // Genero una nueva entrada en el sistema para este elemento recién creado
+            $data = array(
+                'Viewed' => array(
+                    'model' => $modelo->alias,
+                    'model_id' => $modelo->id,
+                    'viewed' => false,
+                    'modified' => false
+                )
+            );
+            $this->loadModel( 'Viewed' );
+            $this->Viewed->save( $data );
+            return;
+        }        
     }
     
     public function afterDelete( Model $modelo ) {
