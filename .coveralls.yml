@@ -1,7 +1,0 @@
-service_name: travis-ci
-repo_token: hXGA3tbxmNW91pafvPLTbhqfFJmXwNXGO
-
-# for php-coveralls
-src_dir: cakephp/app/Plugin/Viewed
-coverage_clover: build/logs/clover.xml
-json_path: build/logs/coveralls-upload.json
