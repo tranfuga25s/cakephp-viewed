@@ -127,4 +127,24 @@ class ViewedBehavior extends ModelBehavior {
         }
         return $results;
     }
+
+    /**
+     *
+     */
+    public function isViewed( Model $modelo ) {
+        if( is_null( $modelo->id ) ) {
+            return -1;
+        }
+
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed');
+        $data = $this->Viewed->find( 'first', array(
+            'conditions' => array( 'model' => $modelo->alias,
+                                   'model_id' => $modelo->id ),
+            'fields' => array( 'viewed' )
+        ));
+        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
+            return -1;
+        }
+        return $data['Viewed']['viewed'];
+    }
 }

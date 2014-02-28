@@ -208,7 +208,7 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertArrayHasKey( $this->Article->alias, $data, "Los datos devueltos no tienen el formato recomendado" );
         $this->assertArrayHasKey( 'viewed', $data[$this->Article->alias], "Falta el campo de viewed" );
-        //$this->assertArrayHasKey( 'modified', $data[$this->Article->alias], "Falta el campo de modified_viewed" );
+        $this->assertArrayHasKey( 'modifiedAfterViewed', $data[$this->Article->alias], "Falta el campo de modifiedAfterViewed" );
     }
 
     /**
@@ -255,6 +255,22 @@ class ViewedTest extends CakeTestCase {
         $data2 = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
         $this->assertArrayHasKey( 'Article', $data2, "No se encontró el elemento Article" );
         $this->assertArrayHasKey( 'modificado', $data2['Article'], "No se encontró el campo 'modificado'" );
+    }
+
+    /**
+     * Funcion que prueba la funcion isViewed()
+     */
+    public function testViewedFunction() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->isViewed(), false, "La funcion de visto o no visto es incorrecta" );
     }
 
 }
