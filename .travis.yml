@@ -41,4 +41,6 @@ script:
 
 after_script:
   - cd cakephp/app/Plugins/Viewed
+  - pwd
+  - ls -l -r ../../../build/logs/*
   - php vendor/bin/coveralls -v
