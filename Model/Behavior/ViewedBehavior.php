@@ -28,7 +28,7 @@ class ViewedBehavior extends ModelBehavior {
      */
     public function setup( Model $model, $settings = array() ) {
         // combino las propiedades
-        $this->settings = array_merge( $settings, $this->defaults );
+        $this->settings = array_replace_recursive( $this->defaults, $settings );
     }
 
     /*!
@@ -120,7 +120,7 @@ class ViewedBehavior extends ModelBehavior {
                     'fields' => array( 'viewed' )
                 ));
                 if( count( $data ) > 0 ) {
-                    $result[$modelo->alias]['viewed'] = $data['Viewed']['viewed'];
+                    $result[$modelo->alias][$this->settings['fields']['viewed']] = $data['Viewed']['viewed'];
                 }
             }
         }

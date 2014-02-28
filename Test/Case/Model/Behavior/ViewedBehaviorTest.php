@@ -62,8 +62,39 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertInternalType( 'boolean', $this->Article->getViewedSettings( 'useModified' ), "La propiedad no es un booleano" );
         $this->assertEqual( true, $this->Article->getViewedSettings( 'useModified' ), "La propiedad predeterminada useModified no es true" );
-
+        
+        $this->assertInternalType( 'array', $this->Article->getViewedSettings( 'fields' ), "La propiedad no es un array" );
+        $data = $this->Article->getViewedSettings( 'fields' );
+        $this->assertArrayHasKey( 'viewed', $data, "La propiedad de campo visto no existe" );
+        $this->assertArrayHasKey( 'modified', $data, "La propiedad de campo modificado no existe" );
+        
         $this->assertEqual( false, $this->Article->getViewedSettings( 'unknown'), "Debería de devolver falso cuando la propeidad no existe" );
+    }
+    
+    public function testSettingsChanged() {
+        $this->Article->Behaviors->load( 'Viewed.Viewed', array(
+                  'fields' => array(
+                      'viewed' => 'visto'
+                  )
+              )
+        );
+        $this->assertInternalType( 'array', $this->Article->getViewedSettings(), "Lo devuelto no es un array" );
+
+        $this->assertInternalType( 'boolean', $this->Article->getViewedSettings( 'markUnviewedOnModified' ), "La propiedad no es un booleano" );
+        $this->assertEqual( true, $this->Article->getViewedSettings( 'markUnviewedOnModified' ), "La propiedad predeterminada markUnviewedOnModified no es true" );
+
+        $this->assertInternalType( 'boolean', $this->Article->getViewedSettings( 'useModified' ), "La propiedad no es un booleano" );
+        $this->assertEqual( true, $this->Article->getViewedSettings( 'useModified' ), "La propiedad predeterminada useModified no es true" );
+        
+        $this->assertInternalType( 'array', $this->Article->getViewedSettings( 'fields' ), "La propiedad no es un array" );
+        $data = $this->Article->getViewedSettings( 'fields' );
+        $this->assertArrayHasKey( 'viewed', $data, "La propiedad de campo visto no existe" );
+        $this->assertEqual( 'visto', $data['viewed'], "No coincide la propiedad nueva" );
+        
+        $this->assertArrayHasKey( 'modified', $data, "La propiedad de campo modificado no existe" );
+        
+        $this->assertEqual( false, $this->Article->getViewedSettings( 'unknown'), "Debería de devolver falso cuando la propeidad no existe" );
+        
     }
 
     /**
@@ -184,7 +215,23 @@ class ViewedTest extends CakeTestCase {
      * Funcion que verifica que el mappeo de nombres funcione correctamente
      */
     public function testFieldNameViewed() {
+        $this->Article->Behaviors->load( 'Viewed.Viewed', array(
+                  'fields' => array(
+                      'viewed' => 'visto'
+                  )
+              )
+        );
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
         
+        $data2 = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertArrayHasKey( 'Article', $data2, "No se encontró el elemento Article" );
+        $this->assertArrayHasKey( 'visto', $data2['Article'], "No se encontró el campo 'visto'" );
     }
 
 }
