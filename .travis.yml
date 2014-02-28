@@ -41,4 +41,5 @@ script:
 
 after_script:
   - mv cakephp/app/Plugin/Viewed cakephp-viewed/
-  - php vendor/bin/coveralls -v
+  - cd cakephp-viewed/
+  - php ../vendor/bin/coveralls -v
