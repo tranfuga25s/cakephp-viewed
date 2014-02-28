@@ -21,4 +21,41 @@ Las siguiente sucesiones de estados pueden realizarse:
 Como usar el plugin
 ===================
 
+Agrege el plugin a su directorio de CakePHP:
 
+- Como submodulo
+
+- Descarga directa
+
+
+Incluya el plugin dentro de su bootstrap:
+``
+CakePlugin::load( 'Viewed' );
+``
+
+Luego agregamos el behavior al modelo que deseamos:
+``
+    public $actsAs = array( 'Viewed.Viewed' );
+``
+
+Lo ultimo que faltará será generar la tabla necesaria para guardar los datos
+``
+app/Console/cake schema create --plugin Viewed
+
+Configuracion y opciones
+========================
+
+Nombre de campos
+----------------
+
+Como el nombre de campo "viewed" y "modified" ya pueden estar tomados dentro de la aplicación, se podrá configurar otro nombre:
+``
+public $actsAs = array(
+    'Viewed' => array(
+        'fields' => array(
+            'viewed' => 'visto',
+            'modified' => 'modificado_desde_visto'
+        )
+    )
+);
+``

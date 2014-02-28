@@ -11,7 +11,11 @@ class ViewedBehavior extends ModelBehavior {
      */
     private $defaults = array(
       'useModified' => true,
-      'markUnviewedOnModified' => true
+      'markUnviewedOnModified' => true,
+      'fields' => array(
+          'viewed' => 'viewed',
+          'modified' => 'modifiedAfterViewed'
+      )
     );
 
     /*!

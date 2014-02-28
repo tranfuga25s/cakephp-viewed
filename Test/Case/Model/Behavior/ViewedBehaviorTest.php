@@ -179,5 +179,12 @@ class ViewedTest extends CakeTestCase {
         $this->assertArrayHasKey( 'viewed', $data[$this->Article->alias], "Falta el campo de viewed" );
         //$this->assertArrayHasKey( 'modified', $data[$this->Article->alias], "Falta el campo de modified_viewed" );
     }
+    
+    /**
+     * Funcion que verifica que el mappeo de nombres funcione correctamente
+     */
+    public function testFieldNameViewed() {
+        
+    }
 
 }
