@@ -117,10 +117,11 @@ class ViewedBehavior extends ModelBehavior {
                         'model_id' => $result[$modelo->alias][$modelo->primaryKey]
                     ),
                     'recursive' => -1,
-                    'fields' => array( 'viewed' )
+                    'fields' => array( 'viewed', 'modified' )
                 ));
                 if( count( $data ) > 0 ) {
                     $result[$modelo->alias][$this->settings['fields']['viewed']] = $data['Viewed']['viewed'];
+                    $result[$modelo->alias][$this->settings['fields']['modified']] = $data['Viewed']['modified'];
                 }
             }
         }
