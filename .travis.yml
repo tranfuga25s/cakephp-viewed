@@ -37,7 +37,8 @@ before_script:
   - mkdir -p build/logs
 
 script:
-  - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover.xml
+  - ./cakephp/app/Console/cake test core AllTests --stderr --coverage-clover build/logs/clover-base.xml
+  - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover-plugin.xml
 
 after_script:
   - cp -R cakephp/app/Plugin/Viewed cakephp-viewed/
