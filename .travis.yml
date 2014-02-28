@@ -40,6 +40,6 @@ script:
   - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover.xml
 
 after_script:
-  - mv cakephp/app/Plugin/Viewed cakephp-viewed/
+  - cp -R cakephp/app/Plugin/Viewed cakephp-viewed/
   - cd cakephp-viewed/
   - php ../vendor/bin/coveralls -v

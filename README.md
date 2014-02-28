@@ -41,6 +41,8 @@ Luego agregamos el behavior al modelo que deseamos:
 Lo ultimo que faltará será generar la tabla necesaria para guardar los datos
 ``
 app/Console/cake schema create --plugin Viewed
+``
+
 
 Configuracion y opciones
 ========================
@@ -59,3 +61,14 @@ public $actsAs = array(
     )
 );
 ``
+
+Uso
+===
+
+Una vez configurado el Behavior en el modelo necesario, este agregará el campo configurado al array de datos traido automaticamente.
+
+TODO
+====
+
+* Agregar configuracion para que el campo aparezca también cuando se utiliza al funcion read()
+* Agregar test y configuracion para el campo modifiedAfterViewed
