@@ -39,4 +39,4 @@ script:
   - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover.xml
 
 after_script:
-  - php vendor/bin/coveralls
+  - php vendor/bin/coveralls -v
