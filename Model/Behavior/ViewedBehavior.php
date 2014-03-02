@@ -136,7 +136,7 @@ class ViewedBehavior extends ModelBehavior {
             return -1;
         }
 
-        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed');
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
         $data = $this->Viewed->find( 'first', array(
             'conditions' => array( 'model' => $modelo->alias,
                                    'model_id' => $modelo->id ),
@@ -146,5 +146,47 @@ class ViewedBehavior extends ModelBehavior {
             return -1;
         }
         return $data['Viewed']['viewed'];
+    }
+
+    /**
+     *
+     */
+    public function isModifiedAfterViewed( Model $modelo ) {
+        if( is_null( $modelo->id ) ) { return -1; }
+
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+        $data = $this->Viewed->find( 'first', array(
+            'conditions' => array( 'model' => $modelo->alias,
+                                   'model_id' => $modelo->id ),
+            'fields' => array( 'modified' )
+        ));
+        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
+            return -1;
+        }
+        return $data['Viewed']['modified'];
+    }
+
+    /**
+     *
+     */
+    public function setViewed( Model $modelo ) {
+        if( is_null( $modelo->id ) ) { return -1; }
+
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+        $data = $this->Viewed->find( 'first', array(
+            'conditions' => array( 'model' => $modelo->alias,
+                                   'model_id' => $modelo->id ),
+            'fields' => array( 'modified', 'viewed', 'id' )
+        ));
+        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
+            return -1;
+        }
+        $data['Viewed']['viewed'] = true;
+        $data['Viewed']['modified'] = false;
+        if( $this->Viewed->save( $data ) ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

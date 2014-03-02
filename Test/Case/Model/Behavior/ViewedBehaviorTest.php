@@ -273,4 +273,67 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->isViewed(), false, "La funcion de visto o no visto es incorrecta" );
     }
 
+    /**
+     * Funcion para testear el funcionamiento de fue modificado luego de visto
+     */
+    public function testModifiedAfterViewed() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "La funcion de modificado despues de visto es incorrecta" );
+    }
+
+
+    /**
+     * Funcion para setear la funcion como vista
+     */
+    public function testSetViewed() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
+
+        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+
+
+    }
+
+        /**
+     * Funcion para setear la funcion como vista
+     */
+    public function testSetModifiedAfterViewed() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
+
+        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+
+        $data[$this->Article->alias][$this->Article->displayField] = 'test2';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
+    }
+
 }
