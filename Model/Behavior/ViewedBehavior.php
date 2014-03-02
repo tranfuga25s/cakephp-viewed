@@ -74,7 +74,7 @@ class ViewedBehavior extends ModelBehavior {
                 'conditions' => array( 'model' => $modelo->alias,
                                        'model_id' => $modelo->id
                                 ),
-                'fields' => array( $modelo->primaryKey ),
+                'fields' => array( 'id', 'viewed' ),
                 'recursive' => -1
             ) );
             if( count( $data ) <= 0 ) {

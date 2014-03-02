@@ -274,7 +274,7 @@ class ViewedTest extends CakeTestCase {
     }
 
     /**
-     * Funcion para testear el funcionamiento de fue modificado luego de visto
+     * Funcion para testear el funcionamiento de fue modificado luego de creado
      */
     public function testModifiedAfterViewed() {
         $this->Article->Behaviors->load('Viewed.Viewed');
@@ -286,7 +286,7 @@ class ViewedTest extends CakeTestCase {
         $data[$this->Article->alias][$this->Article->displayField] = 'test';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
 
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "La funcion de modificado despues de visto es incorrecta" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "La funcion de modificado despues de visto es incorrecta" );
     }
 
 
@@ -306,7 +306,7 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
 
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
 
 
     }
@@ -327,7 +327,7 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
 
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
 
         $data[$this->Article->alias][$this->Article->displayField] = 'test2';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
