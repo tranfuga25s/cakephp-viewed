@@ -23,24 +23,44 @@ Como usar el plugin
 
 Agrege el plugin a su directorio de CakePHP:
 
-- Como submodulo
+Como submodulo
+--------------
 
-- Descarga directa
+Use los siguientes comandos:
+``
+git submodule add https://github.com/tranfuga25s/cakephp-viewed.git app/Plugin/Viewed
+git submodule init
+git submodule update
+``
+Luego siga las intrucciones de agregado del plugin.
 
+Descarga directa
+----------------
+
+Utilice el siguiente link para descargar el archivo comprimido: [![Descagar master](https://github.com/tranfuga25s/cakephp-viewed/archive/master.zip)]
+Cree la carpeta app/Plug/Viewed
+Descomprima los contenidos del archivo dentro del directorio recién creado.
+
+
+Agregado del plugin
+-------------------
 
 Incluya el plugin dentro de su bootstrap:
+
 ``
 CakePlugin::load( 'Viewed' );
 ``
 
 Luego agregamos el behavior al modelo que deseamos:
+
 ``
     public $actsAs = array( 'Viewed.Viewed' );
 ``
 
 Lo ultimo que faltará será generar la tabla necesaria para guardar los datos
+
 ``
-app/Console/cake schema create --plugin Viewed
+./app/Console/cake schema create --plugin Viewed
 ``
 
 
@@ -51,6 +71,7 @@ Nombre de campos
 ----------------
 
 Como el nombre de campo "viewed" y "modified" ya pueden estar tomados dentro de la aplicación, se podrá configurar otro nombre:
+
 ``
 public $actsAs = array(
     'Viewed' => array(
@@ -71,4 +92,3 @@ TODO
 ====
 
 * Agregar configuracion para que el campo aparezca también cuando se utiliza al funcion read()
-* Agregar test y configuracion para el campo modifiedAfterViewed
