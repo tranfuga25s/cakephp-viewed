@@ -39,7 +39,6 @@ before_script:
 script:
   - ./cakephp/app/Console/cake test core AllCache --stderr --coverage-clover build/logs/clover-core-cache.xml
   - ./cakephp/app/Console/cake test core AllCore --stderr --coverage-clover build/logs/clover-core.xml
-  - ./cakephp/app/Console/cake test core Basic --stderr --coverage-clover build/logs/clover-basic.xml
   - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover-plugin.xml
 
 after_script:
