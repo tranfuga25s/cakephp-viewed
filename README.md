@@ -27,9 +27,11 @@ Como submodulo
 --------------
 
 Use los siguientes comandos:
-``git submodule add https://github.com/tranfuga25s/cakephp-viewed.git app/Plugin/Viewed``
-``git submodule init``
-``git submodule update``
+```
+git submodule add https://github.com/tranfuga25s/cakephp-viewed.git app/Plugin/Viewed
+git submodule init
+git submodule update
+```
 Luego siga las intrucciones de agregado del plugin.
 
 Descarga directa
@@ -70,14 +72,16 @@ Nombre de campos
 
 Como el nombre de campo "viewed" y "modified" ya pueden estar tomados dentro de la aplicación, se podrá configurar otro nombre:
 
-``public $actsAs = array(``
-``    'Viewed' => array(``
-``        'fields' => array(``
-``            'viewed' => 'visto',``
-``            'modified' => 'modificado_desde_visto'``
-``        )``
-``    )``
-``);``
+```
+public $actsAs = array(
+    'Viewed' => array(
+        'fields' => array(
+            'viewed' => 'visto',
+            'modified' => 'modificado_desde_visto'
+        )
+    )
+);
+```
 
 
 Uso
