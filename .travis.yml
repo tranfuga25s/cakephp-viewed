@@ -23,7 +23,7 @@ before_script:
      'database' => 'test',
      'host' => '0.0.0.0',
      'login' => 'travis',
-     'prefix' => 'test_',
+     'prefix' => '',
      'persistent' => false,
    );
    }" > cakephp/app/Config/database.php
@@ -37,10 +37,9 @@ before_script:
   - mkdir -p build/logs
 
 script:
-  - ./cakephp/app/Console/cake test core AllCache --stderr --coverage-clover build/logs/clover-core-cache.xml
-  - ./cakephp/app/Console/cake test core AllCore --stderr --coverage-clover build/logs/clover-core.xml
+  - ./cakephp/app/Console/cake test core AllTests --stderr --coverage-clover build/logs/clover-core-cache.xml
   - ./cakephp/app/Console/cake test Viewed Model/Behavior/ViewedBehavior --stderr --coverage-clover build/logs/clover-plugin.xml
 
 after_script:
   - cd cakephp-viewed/
-  - php ../vendor/bin/coveralls
+  - php ../vendor/bin/coveralls -v
