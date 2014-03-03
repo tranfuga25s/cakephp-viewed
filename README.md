@@ -93,3 +93,8 @@ TODO
 ====
 
 * Agregar configuracion para que el campo aparezca también cuando se utiliza al funcion read()
+
+Colaboraciones
+==============
+
+Para realizar algúna colaboración simplemente realize un Fork del respositorio, realice los cambios y test necesarios y haga un "pull request".
