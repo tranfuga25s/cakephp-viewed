@@ -111,6 +111,8 @@ class ViewedBehavior extends ModelBehavior {
         if( count( $results ) > 0 ) {
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
             foreach( $results as &$result ) {
+                if( is_null( $result ) ) { continue; }
+                if( !array_key_exists( $modelo->alias, $result ) ) { continue; }
                 $data = $this->Viewed->find( 'first', array(
                     'conditions' => array(
                         'model' => $modelo->alias,
@@ -122,6 +124,9 @@ class ViewedBehavior extends ModelBehavior {
                 if( count( $data ) > 0 ) {
                     $result[$modelo->alias][$this->settings['fields']['viewed']] = $data['Viewed']['viewed'];
                     $result[$modelo->alias][$this->settings['fields']['modified']] = $data['Viewed']['modified'];
+                } else {
+                    $result[$modelo->alias][$this->settings['fields']['viewed']] = false;
+                    $result[$modelo->alias][$this->settings['fields']['modified']] = false;
                 }
             }
         }

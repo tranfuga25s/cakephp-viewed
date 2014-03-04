@@ -336,4 +336,14 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
     }
 
+
+    public function testFindWhitoutCreate() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first' );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+        $this->assertEqual( $data[$this->Article->alias]['viewed'], false, "No se trajo el campo predeterminado" );
+        $this->assertEqual( $data[$this->Article->alias]['modifiedAfterViewed'], false, "No se trajo el campo predeterminado para modificado luego de visto" );
+    }
+
 }
