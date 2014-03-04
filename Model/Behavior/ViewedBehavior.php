@@ -110,6 +110,7 @@ class ViewedBehavior extends ModelBehavior {
     public function afterFind( Model $modelo, $results, $primary = false ) {
         if( count( $results ) > 0 ) {
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
+            ///@TODO Agregar mejora sacando todos los ID's a una sola consulta
             foreach( $results as &$result ) {
                 if( is_null( $result ) ) { continue; }
                 if( !array_key_exists( $modelo->alias, $result ) ) { continue; }
@@ -175,7 +176,8 @@ class ViewedBehavior extends ModelBehavior {
      *
      */
     public function setViewed( Model $modelo ) {
-        if( is_null( $modelo->id ) ) { return -1; }
+        // Si el modelo no tiene seteado el ID devuelvo falso
+        if( is_null( $modelo->id ) || !$modelo->id ) { return false; }
 
         $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
         $data = $this->Viewed->find( 'first', array(
@@ -184,7 +186,10 @@ class ViewedBehavior extends ModelBehavior {
             'fields' => array( 'modified', 'viewed', 'id' )
         ));
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
-            return -1;
+            // Creo el registro ya que no existe
+            $this->Viewed->create();
+            $data['Viewed']['model'] = $modelo->alias;
+            $data['Viewed']['model_id'] = $modelo->id;
         }
         $data['Viewed']['viewed'] = true;
         $data['Viewed']['modified'] = false;

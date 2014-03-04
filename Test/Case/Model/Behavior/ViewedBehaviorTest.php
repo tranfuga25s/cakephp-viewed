@@ -346,4 +346,35 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data[$this->Article->alias]['modifiedAfterViewed'], false, "No se trajo el campo predeterminado para modificado luego de visto" );
     }
 
+    public function testSetWithoutCreate() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data_article = $this->Article->find( 'first' );
+        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $data_article[$this->Article->alias][$this->Article->primaryKey] ) ) );
+        $this->assertEqual( count( $data ), 0, "No se creo ningun registro!" );
+
+        $this->Article->id = $data_article[$this->Article->alias][$this->Article->primaryKey];
+        $this->assertEqual( $this->Article->setViewed(), true, "No se pudo setear el registro como visto" );
+
+        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $data_article[$this->Article->alias][$this->Article->primaryKey] ) ) );
+        $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro!" );
+        $this->assertArrayHasKey( 'Viewed', $data, "No se pudo encontrar el registro!" );
+
+        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado" );
+        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo' );
+
+        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado" );
+        $this->assertEqual( $data['Viewed']['model_id'],  $data_article[$this->Article->alias][$this->Article->primaryKey], 'No coincide el nombre del modelo' );
+
+        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed" );
+        $this->assertEqual( $data['Viewed']['viewed'], true, 'No coincide el campo viewed' );
+
+        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
+        $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
+    }
+
+    public function testSetWithoutIdSetted() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $this->assertNotEqual( $this->Article->setViewed(), true, "No debe devolver verdadero si no hay id seteado" );
+    }
+
 }
