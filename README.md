@@ -63,6 +63,9 @@ Lo ultimo que faltará será generar la tabla necesaria para guardar los datos
 ./app/Console/cake schema create --plugin Viewed
 ``
 
+Por ultimo es necesario conocer que usuario está generando el cambio para poder retornar las propiedades de visto corretamente.
+Para eso, el Behavior intentará llamar a la función "getCurrentUser". Esta funcion puede ser modificada mediante la configuración.
+Esta función debe devolver el ID del usuario que está realizando la acción.
 
 Configuracion y opciones
 ========================
@@ -83,6 +86,20 @@ public $actsAs = array(
 );
 ```
 
+Nombre de la funcion de id de usuario.
+--------------------------------------
+Siguiendo con el ejemplo anterior, si queremos utilizar la función "obtenerUsuario", la colocamos sin parentesis así:
+```
+public $actsAs = array(
+    'Viewed' => array(
+        'fields' => array(
+            'viewed' => 'visto',
+            'modified' => 'modificado_desde_visto'
+        ),
+        'userFunction' => 'obtenerUsuario'
+    )
+);
+```
 
 Uso
 ===

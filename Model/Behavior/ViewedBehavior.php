@@ -15,7 +15,8 @@ class ViewedBehavior extends ModelBehavior {
       'fields' => array(
           'viewed' => 'viewed',
           'modified' => 'modifiedAfterViewed'
-      )
+      ),
+      'userFunction' => 'getCurrentUser'
     );
 
     /*!
@@ -56,12 +57,18 @@ class ViewedBehavior extends ModelBehavior {
     public function afterSave( Model $modelo, $created, $options = array() ) {
         if( $created ) {
             // Genero una nueva entrada en el sistema para este elemento recién creado
+            $id_usuario = 0;
+            if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+                $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+            }
             $data = array(
                 'Viewed' => array(
                     'model' => $modelo->alias,
                     'model_id' => $modelo->id,
                     'viewed' => false,
-                    'modified' => false
+                    'modified' => false,
+                    'user_id' => $id_usuario
                 )
             );
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
@@ -74,20 +81,31 @@ class ViewedBehavior extends ModelBehavior {
                 'conditions' => array( 'model' => $modelo->alias,
                                        'model_id' => $modelo->id
                                 ),
-                'fields' => array( 'id', 'viewed' ),
+                'fields' => array( 'id', 'viewed', 'user_id' ),
                 'recursive' => -1
             ) );
+
+            $id_usuario = 0;
+            if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+                $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+            }
+
             if( count( $data ) <= 0 ) {
                 $data = array(
                     'Viewed' => array(
                         'model' => $modelo->alias,
-                        'model_id' => $modelo->id
+                        'model_id' => $modelo->id,
+                        'user_id' => $id_usuario
                     )
                 );
             }
             $data['Viewed']['modified'] = true;
             $data['Viewed']['viewed'] = false;
-            $this->Viewed->save( $data );
+
+            if( $data['Viewed']['user_id'] != $id_usuario ) {
+                $this->Viewed->save( $data );
+            }
             return;
         }
     }
@@ -110,10 +128,11 @@ class ViewedBehavior extends ModelBehavior {
     public function afterFind( Model $modelo, $results, $primary = false ) {
         if( count( $results ) > 0 ) {
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
-            ///@TODO Agregar mejora sacando todos los ID's a una sola consulta
+            ///@TODO Agregar mejora sacando todos los ID's a una sola consulta ?
             foreach( $results as &$result ) {
                 if( is_null( $result ) ) { continue; }
                 if( !array_key_exists( $modelo->alias, $result ) ) { continue; }
+                if( !array_key_exists( $modelo->primaryKey, $result[$modelo->alias] ) ) { continue; }
                 $data = $this->Viewed->find( 'first', array(
                     'conditions' => array(
                         'model' => $modelo->alias,
@@ -138,16 +157,21 @@ class ViewedBehavior extends ModelBehavior {
      *
      */
     public function isViewed( Model $modelo ) {
-        if( is_null( $modelo->id ) ) {
-            return -1;
-        }
+        if( is_null( $modelo->id ) || !$modelo->id ) { return -1; }
 
         $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+        }
         $data = $this->Viewed->find( 'first', array(
             'conditions' => array( 'model' => $modelo->alias,
-                                   'model_id' => $modelo->id ),
+                                   'model_id' => $modelo->id,
+                                   'user_id' => $id_usuario ),
             'fields' => array( 'viewed' )
         ));
+
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
             return -1;
         }
@@ -158,7 +182,7 @@ class ViewedBehavior extends ModelBehavior {
      *
      */
     public function isModifiedAfterViewed( Model $modelo ) {
-        if( is_null( $modelo->id ) ) { return -1; }
+        if( is_null( $modelo->id ) || !$modelo->id ) { return -1; }
 
         $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
         $data = $this->Viewed->find( 'first', array(
@@ -191,8 +215,14 @@ class ViewedBehavior extends ModelBehavior {
             $data['Viewed']['model'] = $modelo->alias;
             $data['Viewed']['model_id'] = $modelo->id;
         }
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+        }
         $data['Viewed']['viewed'] = true;
         $data['Viewed']['modified'] = false;
+        $data['Viewed']['user_id'] = $id_usuario;
         if( $this->Viewed->save( $data ) ) {
             return true;
         } else {

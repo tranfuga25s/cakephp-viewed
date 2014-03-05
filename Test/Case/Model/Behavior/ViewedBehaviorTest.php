@@ -2,6 +2,18 @@
 App::uses('Model', 'Model');
 App::uses('ModelBehavior', 'Model');
 App::uses('ViewedBehavior', 'Viewed.Behavior' );
+App::uses('ViewedAppModel', 'Viewed.Model' );
+App::uses('AppModel', 'Model' );
+
+class Articulo extends ViewedAppModel {
+
+    public $useTable = "articles";
+    public $alias = "Article";
+    public $id_usuario = 1;
+
+    public function getCurrentUser() { return $this->id_usuario; }
+    public function cambiarUsuario() { $this->id_usuario += 1; }
+}
 
 /**
  * ViewedTestCase
@@ -21,7 +33,7 @@ class ViewedTest extends CakeTestCase {
      */
     public function setUp() {
             parent::setUp();
-            $this->Article = ClassRegistry::init('Article');
+            $this->Article = ClassRegistry::init('Articulo');
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
     }
 
@@ -164,7 +176,30 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed' );
 
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
-        $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified' );
+        // Tiene que ser falso porque lo editó el mismo usuario
+        $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
+
+
+        $this->Article->cambiarUsuario();
+        $save_data['title'] = 'New title';
+        $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar - cambio usuario" );
+
+        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
+        $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro! - cambio usuario" );
+        $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos! - cambio usuario" );
+
+        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
+        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
+
+        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
+        $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
+
+        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
+        $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed - cambio usuario' );
+
+        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified - cambio usuario" );
+        $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
+
     }
 
     /**
@@ -270,7 +305,7 @@ class ViewedTest extends CakeTestCase {
         $data[$this->Article->alias][$this->Article->displayField] = 'test';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
 
-        $this->assertEqual( $this->Article->isViewed(), false, "La funcion de visto o no visto es incorrecta" );
+        $this->assertEqual( $this->Article->isViewed(), true, "La funcion de visto o no visto es incorrecta" );
     }
 
     /**
@@ -306,7 +341,7 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
 
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
 
 
     }
@@ -327,13 +362,14 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
 
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
 
         $data[$this->Article->alias][$this->Article->displayField] = 'test2';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
 
-        $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto" );
+        // Aca tiene que ser verdadero porque el usuario que edita es el mismo que está loggeado
+        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
     }
 
 
