@@ -346,7 +346,7 @@ class ViewedTest extends CakeTestCase {
 
     }
 
-        /**
+    /**
      * Funcion para setear la funcion como vista
      */
     public function testSetModifiedAfterViewed() {
@@ -372,7 +372,9 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
     }
 
-
+    /**
+     * Verifica que los valores predeterminados sean los correctos cuando no se creó el registro.
+     */
     public function testFindWhitoutCreate() {
         $this->Article->Behaviors->load('Viewed.Viewed');
         $data = $this->Article->find( 'first' );
@@ -382,6 +384,9 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data[$this->Article->alias]['modifiedAfterViewed'], false, "No se trajo el campo predeterminado para modificado luego de visto" );
     }
 
+    /**
+     * Testea la posibilidad de que se llame a un setViewed sin tener el registro original de la creación del registro
+     */
     public function testSetWithoutCreate() {
         $this->Article->Behaviors->load('Viewed.Viewed');
         $data_article = $this->Article->find( 'first' );
@@ -408,6 +413,9 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
     }
 
+    /**
+     * Testea la posibilidad de que el sistema no tenga el ID seteado en el modelo cuando se llama
+     */
     public function testSetWithoutIdSetted() {
         $this->Article->Behaviors->load('Viewed.Viewed');
         $this->assertNotEqual( $this->Article->setViewed(), true, "No debe devolver verdadero si no hay id seteado" );

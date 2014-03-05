@@ -110,6 +110,7 @@ TODO
 ====
 
 * Agregar configuracion para que el campo aparezca también cuando se utiliza al funcion read()
+* Agregar comparaciones para conocer que usuario está realizando el cambio.
 
 Colaboraciones
 ==============
