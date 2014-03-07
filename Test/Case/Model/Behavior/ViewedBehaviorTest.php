@@ -5,6 +5,12 @@ App::uses('ViewedBehavior', 'Viewed.Behavior' );
 App::uses('ViewedAppModel', 'Viewed.Model' );
 App::uses('AppModel', 'Model' );
 
+/**
+ * Clase para probar con un modelo
+ * @property string $useTable Nombre de la tabla a utilizar
+ * @property string $alias
+ * @property integer $id_usuario 
+ */
 class Articulo extends ViewedAppModel {
 
     public $useTable = "articles";
@@ -18,6 +24,8 @@ class Articulo extends ViewedAppModel {
 /**
  * ViewedTestCase
  * @author Esteban Zeller
+ * @property Articulo $Article
+ * @property ViewedBehavior $Viewed 
  */
 class ViewedTest extends CakeTestCase {
 
@@ -111,7 +119,7 @@ class ViewedTest extends CakeTestCase {
 
     /**
      * Testea la capacidad de crear el registro asociado cuando se crea un elemento
-     * @author
+     * @author Esteban Zeller <esteban.zeller@gmail.com>
      */
     public function testCreation() {
         $this->Article->Behaviors->load('Viewed.Viewed');
@@ -139,6 +147,9 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
         $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
+        
+        $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
+        $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
 
     }
 
@@ -164,6 +175,7 @@ class ViewedTest extends CakeTestCase {
 
         $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
         $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro!" );
+        $this->assertEqual( count( $data ), 1, "Se creó mas de un registro en la modificacion!" );
         $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos!" );
 
         $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado" );
@@ -178,28 +190,35 @@ class ViewedTest extends CakeTestCase {
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
         // Tiene que ser falso porque lo editó el mismo usuario
         $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
+        
+        $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
+        $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
+
 
 
         $this->Article->cambiarUsuario();
         $save_data['title'] = 'New title';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar - cambio usuario" );
 
-        $data = $this->Viewed->find( 'first', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
-        $this->assertNotEqual( count( $data ), 0, "No se creo ningun registro! - cambio usuario" );
-        $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos! - cambio usuario" );
+        $data = $this->Viewed->find( 'all', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
+        $this->assertEqual( count( $data ), 2, "No se tiene la cantidad de registros correcta! - cambio usuario" );
+        
+        foreach( $data2 as $data ) {
+            $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos! - cambio usuario" );
 
-        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
+            $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
+            $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
+            $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
+            $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed - cambio usuario' );
+            $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
+            $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed - cambio usuario' );
 
-        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
-
+            $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified - cambio usuario" );
+            $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
+        }
+        ///@TODO verificar numeros de usuario
     }
 
     /**
@@ -214,11 +233,16 @@ class ViewedTest extends CakeTestCase {
         $save_data[$this->Article->alias][$this->Article->primaryKey] = $data[$this->Article->alias][$this->Article->primaryKey];
         $save_data[$this->Article->alias][$this->Article->displayField] = 'New title';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
-
-
+        // Primer registro generado
+        
+        // Genero el segudo articulo
+        $this->Article->cambiarUsuario();
+        $save_data[$this->Article->alias][$this->Article->displayField] = 'New title2';
+        $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
+        
         $this->assertNotEqual( $this->Article->delete( $data[$this->Article->alias][$this->Article->primaryKey] ), false, "No se pudo eliminar el registro" );
 
-        $datos = $this->Viewed->find( 'first', array( 'conditions' => array(
+        $datos = $this->Viewed->find( 'all', array( 'conditions' => array(
             'model' => $this->Article->alias,
             'model_id' => $data[$this->Article->alias][$this->Article->primaryKey] ) )
         );
