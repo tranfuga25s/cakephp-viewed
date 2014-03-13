@@ -96,16 +96,28 @@ class ViewedBehavior extends ModelBehavior {
                     'Viewed' => array(
                         'model' => $modelo->alias,
                         'model_id' => $modelo->id,
-                        'user_id' => $id_usuario
+                        'user_id' => $id_usuario,
+                        'modified' => true,
+                        'viewed' => false
                     )
                 );
-            }
-            $data['Viewed']['modified'] = true;
-            $data['Viewed']['viewed'] = false;
-
-            if( $data['Viewed']['user_id'] != $id_usuario ) {
                 $this->Viewed->save( $data );
+                return;
+            } else if( $id_usuario == 0 ) {
+                // No hay diferenciación de usuario
+                $data['Viewed']['modified'] = true;
+                $data['Viewed']['viewed'] = false;
+                $this->Viewed->save( $data );
+                return;
             }
+            
+            // Coloco como modificado los registros de los usuarios que no son $id_usuario          
+            $this->Viewed->updateAll( 
+                    array( 'modified' => true, 'viewed' => false ),
+                    array( 'model' => $modelo->alias, 
+                           'model_id' => $modelo->id,
+                           'NOT' => array( 'user_id' => $id_usuario ) )
+            );
             return;
         }
     }
