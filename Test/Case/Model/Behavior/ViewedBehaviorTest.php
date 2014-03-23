@@ -9,7 +9,7 @@ App::uses('AppModel', 'Model' );
  * Clase para probar con un modelo
  * @property string $useTable Nombre de la tabla a utilizar
  * @property string $alias
- * @property integer $id_usuario 
+ * @property integer $id_usuario
  */
 class Articulo extends ViewedAppModel {
 
@@ -25,7 +25,7 @@ class Articulo extends ViewedAppModel {
  * ViewedTestCase
  * @author Esteban Zeller
  * @property Articulo $Article
- * @property ViewedBehavior $Viewed 
+ * @property ViewedBehavior $Viewed
  */
 class ViewedTest extends CakeTestCase {
 
@@ -150,7 +150,7 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
         $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
-        
+
         $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
         $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
 
@@ -161,6 +161,7 @@ class ViewedTest extends CakeTestCase {
      * @author
      */
     public function testEdicionBasica() {
+        // Creo un articulo
         $this->Article->Behaviors->load('Viewed.Viewed');
         $save_data = array(
             'Article' => array(
@@ -173,6 +174,7 @@ class ViewedTest extends CakeTestCase {
         $save_data = $this->Article->read();
         $this->assertNotEqual( count( $save_data ), 0, "No se trajo ningun dato" );
 
+        // Lo modifico para que genere el registro correcto
         $save_data['title'] = 'New title';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
 
@@ -188,58 +190,61 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo' );
 
         $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed" );
-        $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed' );
+        $this->assertEqual( $data['Viewed']['viewed'], true, 'No coincide el campo viewed' );
 
         $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified" );
         // Tiene que ser falso porque lo editó el mismo usuario
         $this->assertEqual( $data['Viewed']['modified'], false, 'No coincide el campo modified' );
-        
+
         $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
         $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
 
-        /// MOdificación luego de cambiar de usuario
+        /// Modificación luego de cambiar de usuario
         $this->Article->cambiarUsuario();
         $save_data['title'] = 'New title2';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar - cambio usuario" );
 
         $data2 = $this->Viewed->find( 'all', array( 'conditions' => array( 'model' => $this->Article->alias, 'model_id' => $save_data[$this->Article->alias][$this->Article->primaryKey] ) ) );
-        $this->assertEqual( count( $data ), 2, "No se tiene la cantidad de registros correcta! - cambio usuario" );
-        
+        debug( $data2 );
+        $this->assertEqual( count( $data2 ), 2, "No se tiene la cantidad de registros correcta! - cambio usuario" );
+
+        // Usuario que primero modifico el registro
         $data = $data2[0];
-        $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos! - cambio usuario" );
+        $this->assertArrayHasKey( 'Viewed', $data2, "No se encuentran los datos! - cambio usuario" );
 
-        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
+        $this->assertArrayHasKey( 'model', $data2['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
+        $this->assertArrayHasKey( 'model_id', $data2['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['viewed'], false, 'No coincide el campo viewed - cambio usuario' );
+        $this->assertArrayHasKey( 'viewed', $data2['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['viewed'], false, 'No coincide el campo viewed - cambio usuario' );
 
-        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
-        
-        $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
-        $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser()-1, "El ID de usuario no coincide" );
+        $this->assertArrayHasKey( 'modified', $data2['Viewed'], "No se encuentra el campo modified - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
 
+        $this->assertArrayHasKey( 'user_id', $data2['Viewed'], "No se encuentra el campo de usuario" );
+        $this->assertEqual( $data2['Viewed']['user_id'], $this->Article->getCurrentUser()-1, "El ID de usuario no coincide" );
+
+        // Usuario que modificó ultimo el registro
         $data = $data2[1];
-        $this->assertArrayHasKey( 'Viewed', $data, "No se encuentran los datos! - cambio usuario" );
+        $this->assertArrayHasKey( 'Viewed', $data2, "No se encuentran los datos! - cambio usuario" );
 
-        $this->assertArrayHasKey( 'model', $data['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
+        $this->assertArrayHasKey( 'model', $data2['Viewed'], "No se encuentra el modelo relacionado - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['model'], 'Article', 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'model_id', $data['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
+        $this->assertArrayHasKey( 'model_id', $data2['Viewed'], "No se encuentra el id del modelo relacionado - cambio usuario" );
         $this->assertEqual( $data['Viewed']['model_id'],  $id, 'No coincide el nombre del modelo - cambio usuario' );
 
-        $this->assertArrayHasKey( 'viewed', $data['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['viewed'], true, 'No coincide el campo viewed - cambio usuario' );
+        $this->assertArrayHasKey( 'viewed', $data2['Viewed'], "No se encuentra el campo viewed - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['viewed'], true, 'No coincide el campo viewed - cambio usuario' );
 
-        $this->assertArrayHasKey( 'modified', $data['Viewed'], "No se encuentra el campo modified - cambio usuario" );
-        $this->assertEqual( $data['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
+        $this->assertArrayHasKey( 'modified', $data2['Viewed'], "No se encuentra el campo modified - cambio usuario" );
+        $this->assertEqual( $data2['Viewed']['modified'], true, 'No coincide el campo modified - cambio usuario' );
 
-        $this->assertArrayHasKey( 'user_id', $data['Viewed'], "No se encuentra el campo de usuario" );
-        $this->assertEqual( $data['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
+        $this->assertArrayHasKey( 'user_id', $data2['Viewed'], "No se encuentra el campo de usuario" );
+        $this->assertEqual( $data2['Viewed']['user_id'], $this->Article->getCurrentUser(), "El ID de usuario no coincide" );
     }
 
     /**
@@ -255,12 +260,12 @@ class ViewedTest extends CakeTestCase {
         $save_data[$this->Article->alias][$this->Article->displayField] = 'New title';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
         // Primer registro generado
-        
+
         // Genero el segudo articulo
         $this->Article->cambiarUsuario();
         $save_data[$this->Article->alias][$this->Article->displayField] = 'New title2';
         $this->assertNotEqual( false, $this->Article->save( $save_data ), "Falla el guardar" );
-        
+
         $this->assertNotEqual( $this->Article->delete( $data[$this->Article->alias][$this->Article->primaryKey] ), false, "No se pudo eliminar el registro" );
 
         $datos = $this->Viewed->find( 'all', array( 'conditions' => array(

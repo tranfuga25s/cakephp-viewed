@@ -76,6 +76,8 @@ class ViewedBehavior extends ModelBehavior {
             return;
         } else {
             // Actualizo la información del registro
+
+            // Busco los registros relacionados en Viewed.
             $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
             $data = $this->Viewed->find( 'first', array(
                 'conditions' => array( 'model' => $modelo->alias,
@@ -85,12 +87,14 @@ class ViewedBehavior extends ModelBehavior {
                 'recursive' => -1
             ) );
 
+            // Consulto el usuario actual ( si existe )
             $id_usuario = 0;
             if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
                 $function_name = $this->settings['userFunction'];
                 $id_usuario = $modelo->$function_name();
             }
 
+            // Si no existe ningun registro, genero el registro para el usuario actual
             if( count( $data ) <= 0 ) {
                 $data = array(
                     'Viewed' => array(
@@ -104,20 +108,43 @@ class ViewedBehavior extends ModelBehavior {
                 $this->Viewed->save( $data );
                 return;
             } else if( $id_usuario == 0 ) {
-                // No hay diferenciación de usuario
+                // No hay diferenciación de usuario - El sistema se comporta como comparador ( algun usuario vio el registro )
                 $data['Viewed']['modified'] = true;
                 $data['Viewed']['viewed'] = false;
                 $this->Viewed->save( $data );
                 return;
             }
-            
-            // Coloco como modificado los registros de los usuarios que no son $id_usuario          
-            $this->Viewed->updateAll( 
+
+            // Coloco como modificado los registros de los usuarios que no son $id_usuario
+            $this->Viewed->updateAll(
                     array( 'modified' => true, 'viewed' => false ),
-                    array( 'model' => $modelo->alias, 
+                    array( 'model' => $modelo->alias,
                            'model_id' => $modelo->id,
                            'NOT' => array( 'user_id' => $id_usuario ) )
             );
+
+            // Busco la cantidad de registros que coinciden con el usuario actual
+            if( Set::matches('/Viewed[id='.$id_usuario.']', $data ) ) {
+                // El registro del usuario actual debe ser puesto como modificado = false y Viewed = true
+                $this->Viewed->updateAll(
+                        array( 'modified' => false, 'viewed' => true ),
+                        array( 'model' => $modelo->alias,
+                               'model_id' => $modelo->id,
+                               'user_id' => $id_usuario )
+                );
+            } else {
+                // Tengo que crear el registro para el usuario actual
+                $data = array(
+                    'Viewed' => array(
+                        'model' => $modelo->alias,
+                        'model_id' => $modelo->id,
+                        'user_id' => $id_usuario,
+                        'modified' => false,
+                        'viewed' => true
+                    )
+                );
+                $this->Viewed->save( $data );
+            }
             return;
         }
     }
