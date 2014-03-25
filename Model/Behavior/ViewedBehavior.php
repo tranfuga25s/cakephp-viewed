@@ -72,6 +72,7 @@ class ViewedBehavior extends ModelBehavior {
                 )
             );
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
+            $this->Viewed->create();
             $this->Viewed->save( $data );
             return;
         } else {
@@ -79,7 +80,7 @@ class ViewedBehavior extends ModelBehavior {
 
             // Busco los registros relacionados en Viewed.
             $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
-            $data = $this->Viewed->find( 'first', array(
+            $data = $this->Viewed->find( 'all', array(
                 'conditions' => array( 'model' => $modelo->alias,
                                        'model_id' => $modelo->id
                                 ),
@@ -102,9 +103,10 @@ class ViewedBehavior extends ModelBehavior {
                         'model_id' => $modelo->id,
                         'user_id' => $id_usuario,
                         'modified' => true,
-                        'viewed' => false
+                        'viewed' => true
                     )
                 );
+                $this->Viewed->create();
                 $this->Viewed->save( $data );
                 return;
             } else if( $id_usuario == 0 ) {
@@ -122,6 +124,8 @@ class ViewedBehavior extends ModelBehavior {
                            'model_id' => $modelo->id,
                            'NOT' => array( 'user_id' => $id_usuario ) )
             );
+            
+            
 
             // Busco la cantidad de registros que coinciden con el usuario actual
             if( Set::matches('/Viewed[id='.$id_usuario.']', $data ) ) {
@@ -143,6 +147,7 @@ class ViewedBehavior extends ModelBehavior {
                         'viewed' => true
                     )
                 );
+                $this->Viewed->create();
                 $this->Viewed->save( $data );
             }
             return;
@@ -211,8 +216,9 @@ class ViewedBehavior extends ModelBehavior {
             'fields' => array( 'viewed' )
         ));
 
+        // Si count(data) == 0 => no existe registro para el usuario actual
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
-            return -1;
+            return false;
         }
         return $data['Viewed']['viewed'];
     }
