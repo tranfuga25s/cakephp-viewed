@@ -398,6 +398,9 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
         $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
 
+        $this->Article->cambiarUsuario();
+        $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto x otro usuario es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto x otro usuario es incorrecto" );
 
     }
 

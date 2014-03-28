@@ -74,6 +74,7 @@ class ViewedBehavior extends ModelBehavior {
             $this->Viewed = ClassRegistry::init('Viewed.Viewed');
             $this->Viewed->create();
             $this->Viewed->save( $data );
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
             return;
         } else {
             // Actualizo la información del registro
@@ -108,12 +109,14 @@ class ViewedBehavior extends ModelBehavior {
                 );
                 $this->Viewed->create();
                 $this->Viewed->save( $data );
+                ClassRegistry::removeObject( 'Viewed.Viewed' );
                 return;
             } else if( $id_usuario == 0 ) {
                 // No hay diferenciación de usuario - El sistema se comporta como comparador ( algun usuario vio el registro )
                 $data['Viewed']['modified'] = true;
                 $data['Viewed']['viewed'] = false;
                 $this->Viewed->save( $data );
+                ClassRegistry::removeObject( 'Viewed.Viewed' );
                 return;
             }
 
@@ -150,6 +153,7 @@ class ViewedBehavior extends ModelBehavior {
                 $this->Viewed->create();
                 $this->Viewed->save( $data );
             }
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
             return;
         }
     }
@@ -160,6 +164,7 @@ class ViewedBehavior extends ModelBehavior {
     public function afterDelete( Model $modelo ) {
         $this->Viewed = ClassRegistry::init('Viewed.Viewed');
         $this->Viewed->deleteAll( array( 'model' => $modelo->alias, 'model_id' => $modelo->id ) );
+        ClassRegistry::removeObject( 'Viewed.Viewed' );
     }
 
     /**
@@ -193,6 +198,7 @@ class ViewedBehavior extends ModelBehavior {
                     $result[$modelo->alias][$this->settings['fields']['modified']] = false;
                 }
             }
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
         }
         return $results;
     }
@@ -220,6 +226,7 @@ class ViewedBehavior extends ModelBehavior {
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
             return false;
         }
+        ClassRegistry::removeObject( 'Viewed.Viewed' );
         return $data['Viewed']['viewed'];
     }
 
@@ -238,20 +245,28 @@ class ViewedBehavior extends ModelBehavior {
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
             return -1;
         }
+        ClassRegistry::removeObject( 'Viewed.Viewed' );
         return $data['Viewed']['modified'];
     }
 
     /**
-     *
+     * Setea el campo y modelo actual como visto para el usuario seleccionado
      */
     public function setViewed( Model $modelo ) {
         // Si el modelo no tiene seteado el ID devuelvo falso
         if( is_null( $modelo->id ) || !$modelo->id ) { return false; }
+        
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+        }
 
         $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
         $data = $this->Viewed->find( 'first', array(
             'conditions' => array( 'model' => $modelo->alias,
-                                   'model_id' => $modelo->id ),
+                                   'model_id' => $modelo->id,
+                                   'user_id' => $id_usuario ),
             'fields' => array( 'modified', 'viewed', 'id' )
         ));
         if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
@@ -259,18 +274,15 @@ class ViewedBehavior extends ModelBehavior {
             $this->Viewed->create();
             $data['Viewed']['model'] = $modelo->alias;
             $data['Viewed']['model_id'] = $modelo->id;
-        }
-        $id_usuario = 0;
-        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
-            $function_name = $this->settings['userFunction'];
-                $id_usuario = $modelo->$function_name();
+            $data['Viewed']['user_id'] = $id_usuario;
         }
         $data['Viewed']['viewed'] = true;
         $data['Viewed']['modified'] = false;
-        $data['Viewed']['user_id'] = $id_usuario;
         if( $this->Viewed->save( $data ) ) {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
             return true;
         } else {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
             return false;
         }
     }
