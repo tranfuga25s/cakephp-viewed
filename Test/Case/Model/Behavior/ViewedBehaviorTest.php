@@ -393,10 +393,15 @@ class ViewedTest extends CakeTestCase {
         $data[$this->Article->alias][$this->Article->displayField] = 'test';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
 
-        $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
+        $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falla" );
 
-        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
-        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+        
+        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );      
+        $modificado = $this->Article->isModifiedAfterViewed();
+        $this->assertNotEqual( $modificado, -1, "El valor de modificado no debería ser -1" );
+        $this->assertNotEqual( $modificado, -2, "El valor de moficado no debería ser -2" );
+        $this->assertNotEqual( $modificado, -3, "El valor de modificado no debería ser -3" );
+        $this->assertEqual( $modificado, false, "El valor de modificado luego de visto es incorrecto" );
 
         $this->Article->cambiarUsuario();
         $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto x otro usuario es incorrecto" );

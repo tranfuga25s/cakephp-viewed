@@ -235,15 +235,27 @@ class ViewedBehavior extends ModelBehavior {
      */
     public function isModifiedAfterViewed( Model $modelo ) {
         if( is_null( $modelo->id ) || !$modelo->id ) { return -1; }
+        
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+            $id_usuario = $modelo->$function_name();
+        }
 
         $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
         $data = $this->Viewed->find( 'first', array(
             'conditions' => array( 'model' => $modelo->alias,
-                                   'model_id' => $modelo->id ),
+                                   'model_id' => $modelo->id,
+                                   'user_id' => $id_usuario ),
             'fields' => array( 'modified' )
         ));
-        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
-            return -1;
+        if( count( $data ) <= 0  ) {
+            // Si el usuario != 0 y no hay datos, el usuario nunca vio el elemento
+            return -2;
+        }
+        if( !array_key_exists( 'Viewed', $data ) ) {
+            // Error de datos traidos!
+            return -3;
         }
         ClassRegistry::removeObject( 'Viewed.Viewed' );
         return $data['Viewed']['modified'];
