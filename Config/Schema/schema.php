@@ -14,7 +14,7 @@ class ViewedSchema extends CakeSchema {
         'model_id' => array('type' => 'integer', 'null' => false, 'default' => null),
         'user_id' => array( 'type' => 'integer', 'null' => false, 'default' => null),
         'viewed' => array('type' => 'boolean', 'null' => false, 'default' => null),
-        'modified' => array('type' => 'boolean', 'null' => false, 'default' => null),        
+        'modified_after' => array('type' => 'boolean', 'null' => false, 'default' => null),        
         'indexes' => array(
             'PRIMARY' => array('column' => 'id', 'unique' => 1 )
         ),

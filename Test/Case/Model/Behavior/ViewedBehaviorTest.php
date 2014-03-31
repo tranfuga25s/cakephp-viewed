@@ -401,6 +401,7 @@ class ViewedTest extends CakeTestCase {
         $this->assertNotEqual( intval( $modificado ), -1, "El valor de modificado no debería ser -1" );
         $this->assertNotEqual( intval( $modificado ), -2, "El valor de modificado no debería ser -2" );
         $this->assertNotEqual( intval( $modificado ), -3, "El valor de modificado no debería ser -3" );
+
         $this->assertEqual( $modificado, false, "El valor de modificado luego de visto es incorrecto" );
 
         $this->Article->cambiarUsuario();

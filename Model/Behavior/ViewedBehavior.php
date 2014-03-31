@@ -249,6 +249,7 @@ class ViewedBehavior extends ModelBehavior {
                                    'user_id' => $id_usuario ),
             'fields' => array( 'modified_after' )
         ));
+
         ClassRegistry::removeObject( 'Viewed.Viewed' );
         if( count( $data ) <= 0  ) {
             // Si el usuario != 0 y no hay datos, el usuario nunca vio el elemento
