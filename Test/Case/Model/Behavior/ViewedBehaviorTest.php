@@ -19,6 +19,7 @@ class Articulo extends ViewedAppModel {
 
     public function getCurrentUser() { return $this->id_usuario; }
     public function cambiarUsuario() { $this->id_usuario += 1; }
+    public function setearUsuarioOriginal() { $this->id_usuario = 1; }
 }
 
 /**
@@ -427,6 +428,10 @@ class ViewedTest extends CakeTestCase {
 
         $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
         $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+        
+        $this->Article->cambiarUsuario();
+        $this->assertEqual( $this->Article->setViewed(), true, "No se pudo setear como visto para otro usuario" );
+        $this->Article->setearUsuarioOriginal();
 
         $data[$this->Article->alias][$this->Article->displayField] = 'test2';
         $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
@@ -438,6 +443,14 @@ class ViewedTest extends CakeTestCase {
         $this->assertNotEqual( intval( $modificado ), -2, "El valor de modificado no debería ser -2" );
         $this->assertNotEqual( intval( $modificado ), -3, "El valor de modificado no debería ser -3" );
         $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+        
+        $this->Article->cambiarUsuario();
+        $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto para otro usuario es incorrecto" );
+        $modificado = $this->Article->isModifiedAfterViewed();
+        $this->assertNotEqual( intval( $modificado ), -1, "El valor de modificado no debería ser -1 para otro usuario" );
+        $this->assertNotEqual( intval( $modificado ), -2, "El valor de modificado no debería ser -2 para otro usuario" );
+        $this->assertNotEqual( intval( $modificado ), -3, "El valor de modificado no debería ser -3 para otro usuario" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), true, "El valor de modificado luego de visto es incorrecto para otro usuario" );
     }
 
     /**
@@ -478,7 +491,7 @@ class ViewedTest extends CakeTestCase {
         $this->assertEqual( $data['Viewed']['viewed'], true, 'No coincide el campo viewed' );
 
         $this->assertArrayHasKey( 'modified_after', $data['Viewed'], "No se encuentra el campo modified" );
-        $this->assertEqual( $data['Viewed']['modified_after'], false, 'No coincide el campo modified' );
+        $this->assertEqual( $data['Viewed']['modified_after'], false, 'No coincide el campo modified' );        
     }
 
     /**
