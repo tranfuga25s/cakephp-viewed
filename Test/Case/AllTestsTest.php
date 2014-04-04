@@ -13,9 +13,7 @@ class AllTests extends PHPUnit_Framework_TestSuite {
      */
     public static function suite() {
             $suite = new self('All Tests');
-            $suite->addTestFile( ROOT. DS . APP_DIR . DS . 'Plugin' . DS . 'PreguntaFrecuente'. DS . 'Test'. DS. 'Case'. DS .'Controller' . DS . 'ControllersTest.php' );
-            $suite->addTestFile( ROOT. DS . APP_DIR . DS . 'Plugin' . DS . 'PreguntaFrecuente'. DS . 'Test'. DS. 'Case'. DS .'Model' . DS . 'AllModelsTest.php' );
-            //$suite->addTestFile( ROOT. DS . APP_DIR . DS . 'Plugin' . DS . 'PreguntaFrecuente'. DS . 'Test'. DS. 'Case'. DS . 'View' . DS . 'AllViewsTest.php');
+            $suite->addTestFile( ROOT. DS . APP_DIR . DS . 'Plugin' . DS . 'Viewed'. DS . 'Test'. DS. 'Case'. DS .'Model' . DS . 'Behavior' . DS . 'ViewedBehaviorTest.php' );
             return $suite;
     }
     
