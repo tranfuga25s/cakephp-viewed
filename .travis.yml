@@ -37,7 +37,7 @@ before_script:
   - mkdir -p build/logs
 
 script:
-  - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover.xml
+  - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover-plugin.xml
 
 after_script:
   - cd cakephp-viewed/
