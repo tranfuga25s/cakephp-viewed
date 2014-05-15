@@ -2,6 +2,8 @@ language: php
 
 php:
   - 5.3
+  - 5.4
+  - 5.5
 
 before_script:
   - git clone git://github.com/cakephp/cakephp ../cakephp
@@ -37,7 +39,7 @@ before_script:
   - mkdir -p build/logs
 
 script:
-  - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover-plugin.xml
+  - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover-plugin.xml --include-path vendor/phpunit/phpunit
 
 after_script:
   - cd cakephp-viewed/

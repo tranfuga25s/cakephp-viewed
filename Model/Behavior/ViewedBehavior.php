@@ -308,4 +308,42 @@ class ViewedBehavior extends ModelBehavior {
             return false;
         }
     }
+    
+    /**
+     * Setea el campo y modelo actual como visto para el usuario seleccionado
+     */
+    public function setNotViewed( Model $modelo ) {
+        // Si el modelo no tiene seteado el ID devuelvo falso
+        if( is_null( $modelo->id ) || !$modelo->id ) { return false; }
+        
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+        }
+
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+        $data = $this->Viewed->find( 'first', array(
+            'conditions' => array( 'model' => $modelo->alias,
+                                   'model_id' => $modelo->id,
+                                   'user_id' => $id_usuario ),
+            'fields' => array( 'modified_after', 'viewed', 'id' )
+        ));
+        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
+            // Creo el registro ya que no existe
+            $this->Viewed->create();
+            $data['Viewed']['model'] = $modelo->alias;
+            $data['Viewed']['model_id'] = $modelo->id;
+            $data['Viewed']['user_id'] = $id_usuario;
+        }
+        $data['Viewed']['viewed'] = false;
+        $data['Viewed']['modified_after'] = false;
+        if( $this->Viewed->save( $data ) ) {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
+            return true;
+        } else {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
+            return false;
+        }
+    }
 }
