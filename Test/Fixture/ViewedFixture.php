@@ -23,7 +23,7 @@ class ViewedFixture extends CakeTestFixture {
 		'model_id' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'user_id' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'viewed' => array('type' => 'boolean', 'null' => false, 'default' => false),
-		'modified' => array('type' => 'boolean', 'null' => false, 'default' => false),
+		'modified_after' => array('type' => 'boolean', 'null' => false, 'default' => false),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		),
