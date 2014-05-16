@@ -327,18 +327,13 @@ class ViewedBehavior extends ModelBehavior {
             'conditions' => array( 'model' => $modelo->alias,
                                    'model_id' => $modelo->id,
                                    'user_id' => $id_usuario ),
-            'fields' => array( 'modified_after', 'viewed', 'id' )
+            'fields' => array( 'id' )
         ));
-        if( count( $data ) <= 0 || !array_key_exists( 'Viewed', $data ) ) {
-            // Creo el registro ya que no existe
-            $this->Viewed->create();
-            $data['Viewed']['model'] = $modelo->alias;
-            $data['Viewed']['model_id'] = $modelo->id;
-            $data['Viewed']['user_id'] = $id_usuario;
+        $this->Viewed->id = $data['Viewed']['id'];
+        if( !$this->Viewed->exists() ) {
+            throw new NotFoundException( "No se encontró el registro de visto/no visto");
         }
-        $data['Viewed']['viewed'] = false;
-        $data['Viewed']['modified_after'] = false;
-        if( $this->Viewed->save( $data ) ) {
+        if( $this->Viewed->saveField( 'viewed', false ) ) {
             ClassRegistry::removeObject( 'Viewed.Viewed' );
             return true;
         } else {
