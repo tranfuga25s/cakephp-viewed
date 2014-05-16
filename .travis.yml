@@ -37,7 +37,7 @@ before_script:
   - cp cakephp/app/Plugin/Viewed/.coveralls.yml .coveralls.yml
   - composer install --dev
   - mkdir -p build/logs
-  - mv vendor/phpunit/phpunit vendor/phpunit2
+  - mv vendor/phpunit/phpunit cakephp/vendor/phpunit
 
 script:
   - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover-plugin.xml --include-path vendor/phpunit/phpunit
