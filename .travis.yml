@@ -38,6 +38,7 @@ before_script:
   - composer install --dev
   - mkdir -p build/logs
   - mv vendor/phpunit/phpunit cakephp/app/Vendor/phpunit
+  - ls -l -R cakephp/app/Vendor
 
 script:
   - ./cakephp/app/Console/cake test Viewed AllTests --stderr --coverage-clover build/logs/clover-plugin.xml --include-path vendor/phpunit/phpunit
