@@ -308,4 +308,37 @@ class ViewedBehavior extends ModelBehavior {
             return false;
         }
     }
+    
+    /**
+     * Setea el campo y modelo actual como visto para el usuario seleccionado
+     */
+    public function setNotViewed( Model $modelo ) {
+        // Si el modelo no tiene seteado el ID devuelvo falso
+        if( is_null( $modelo->id ) || !$modelo->id ) { return false; }
+        
+        $id_usuario = 0;
+        if( method_exists( $modelo, $this->settings['userFunction'] ) ) {
+            $function_name = $this->settings['userFunction'];
+                $id_usuario = $modelo->$function_name();
+        }
+
+        $this->Viewed = ClassRegistry::init( 'Viewed.Viewed' );
+        $data = $this->Viewed->find( 'first', array(
+            'conditions' => array( 'model' => $modelo->alias,
+                                   'model_id' => $modelo->id,
+                                   'user_id' => $id_usuario ),
+            'fields' => array( 'id' )
+        ));
+        $this->Viewed->id = $data['Viewed']['id'];
+        if( !$this->Viewed->exists() ) {
+            throw new NotFoundException( "No se encontró el registro de visto/no visto");
+        }
+        if( $this->Viewed->saveField( 'viewed', false ) ) {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
+            return true;
+        } else {
+            ClassRegistry::removeObject( 'Viewed.Viewed' );
+            return false;
+        }
+    }
 }

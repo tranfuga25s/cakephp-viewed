@@ -20,6 +20,7 @@ class Articulo extends ViewedAppModel {
     public function getCurrentUser() { return $this->id_usuario; }
     public function cambiarUsuario() { $this->id_usuario += 1; }
     public function setearUsuarioOriginal() { $this->id_usuario = 1; }
+
 }
 
 /**
@@ -504,4 +505,31 @@ class ViewedTest extends CakeTestCase {
         $this->assertNotEqual( intval( $devolucion ), intval( true ), "No debe devolver verdadero si no hay id seteado" );
     }
 
+    
+    /**
+     * Funcion para setear la funcion como vista
+     */
+    public function testSetNotViewed() {
+        $this->Article->Behaviors->load('Viewed.Viewed');
+        $data = $this->Article->find( 'first', array( 'fields' => $this->Article->primaryKey ) );
+        $this->assertNotEqual( count( $data ), 0, "No existen datos!" );
+        $this->assertNotEqual( count( $data[$this->Article->alias] ), 0, "No se trajo ningun campo" );
+
+        $this->Article->id = $data[$this->Article->alias][$this->Article->primaryKey];
+        $data[$this->Article->alias][$this->Article->displayField] = 'test';
+        $this->assertNotEqual( false, $this->Article->save( $data ), "No se pudo guardar los datos" );
+
+        $this->assertEqual( $this->Article->setViewed(), true, "La funcion de setear como visto devolvió falta" );
+
+        $this->assertEqual( $this->Article->isViewed(), true, "El valor de visto es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto es incorrecto" );
+
+        $this->Article->cambiarUsuario();
+        $this->assertEqual( $this->Article->isViewed(), false, "El valor de visto x otro usuario es incorrecto" );
+        $this->assertEqual( $this->Article->isModifiedAfterViewed(), false, "El valor de modificado luego de visto x otro usuario es incorrecto" );
+        
+        $this->Article->setearUsuarioOriginal();
+        $this->assertEqual( $this->Article->setNotViewed(), true, "No se pudo poner como no visto" );
+        $this->assertEqual( $this->Article->isViewed(), false, "Fallo cambiar el valor" );
+    }
 }
